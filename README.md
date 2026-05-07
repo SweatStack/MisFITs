@@ -24,6 +24,7 @@ misfits/
 │   └── metadata.json        # validated against schema/fixture.schema.json
 ├── schema/fixture.schema.json
 ├── index.json               # generated; aggregate of every metadata.json
+├── tools/build-index.py     # rebuilds index.json from sidecars (stdlib only)
 ├── TAXONOMY.md              # the defect ontology
 ├── SCHEMA.md                # human-readable metadata reference
 └── CONTRIBUTING.md
