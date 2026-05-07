@@ -1,0 +1,14 @@
+{
+  "$schema": "../../schema/fixture.schema.json",
+  "title": "Cycling activity with duplicate, non-monotonic timestamps",
+  "description": "Road cycling activity recorded 2020-07-21, 1:59:10 / 46.4 km, on a Garmin Forerunner 35 (a running watch repurposed for cycling) plus a generic Garmin sensor. 7,150 record rows. Of those, 22 timestamps are exact duplicates of an earlier record's timestamp, and the timestamp sequence is not monotonically non-decreasing — i.e. samples appear with timestamps earlier than the preceding sample. The defect is in the time-series ordering, not in any individual sample's value.",
+  "defects": [
+    {
+      "layer": 4,
+      "nature": "implausible",
+      "cause": ["sensor", "firmware"],
+      "notes": "22 records carry timestamps identical to earlier records, and the overall timestamp sequence is not monotonic. Two physical samples cannot share an instant, and time cannot run backwards."
+    }
+  ],
+  "expected_behavior": "Parser must not crash on duplicate or out-of-order timestamps. Robust parsers should detect the condition and either (a) drop the duplicates / reorder, or (b) surface a warning with the offending indices so downstream code can decide. Aggregate computations (avg/max power, normalized power, distance integration) should be defined on a deduplicated, monotonic projection — not on the raw stream."
+}

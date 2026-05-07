@@ -1,0 +1,7 @@
+{
+  "$schema": "../../schema/fixture.schema.json",
+  "title": "Running activity with developer fields",
+  "description": "Road running activity recorded 2024-12-10, 47:09 / 7.6 km, on a Garmin fenix 6 with HRM Pro, Stryd, Moxy, and two third-party developer devices (CORE body temperature, Concept2). 2,831 record rows, monotonic timestamps, no duplicates. The file itself is clean — its value is as a control for parsers that need to handle FIT developer-field declarations and the corresponding developer-data records without crashing or silently dropping data.",
+  "defects": [],
+  "expected_behavior": "Parser should return 2,831 records, populate the standard columns, and either expose developer fields (CORE body temperature, Concept2 metrics) or skip them cleanly. A parser that crashes on developer field definitions is broken; a parser that silently discards them without warning is also questionable."
+}

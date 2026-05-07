@@ -1,0 +1,13 @@
+{
+  "$schema": "../../schema/fixture.schema.json",
+  "title": "Activity file with session totals but zero record messages",
+  "description": "A 339-byte FIT activity file produced by Garmin Connect (the web platform, listed as creator). The file contains a valid activity/session/lap structure declaring a 40-minute, 4 km running activity on 2020-10-24, but contains zero `record` messages — the per-second time-series data is entirely absent. This shape arises in practice when summaries are exported without sample data, or when records are stripped server-side.",
+  "defects": [
+    {
+      "layer": 4,
+      "nature": "missing",
+      "notes": "Activity, session, and lap messages are present and self-consistent (40:00 / 4 km), but there are no `record` messages at all. The full record-level time series is missing, not gappy."
+    }
+  ],
+  "expected_behavior": "Parser must not crash on an activity with zero records. It should expose session/lap totals (duration 40:00, distance 4 km, sport running) and return an empty record stream — not synthesize fake records from the totals."
+}

@@ -1,0 +1,7 @@
+{
+  "$schema": "../../schema/fixture.schema.json",
+  "title": "Clean ~1 hour road running activity",
+  "description": "Road running activity recorded 2024-03-05, 56:07 / 9.6 km, on a Garmin fenix 6 paired with five sensors: Garmin HRM Pro (heart rate), Stryd (power), Moxy (muscle oxygen), and two generic Garmin sensors. 3,369 record rows, monotonic timestamps, no duplicates. Control fixture: representative of a well-formed multi-sensor activity.",
+  "defects": [],
+  "expected_behavior": "Parser should return 3,369 records spanning 2024-03-05T10:03:07Z to 10:59:15Z, populate heart_rate / cadence / power / speed / altitude / temperature / distance, and report sport=running, sub_sport=road. No defect-related warnings expected."
+}

@@ -1,3 +1,60 @@
 {
-  "fixtures": []
+  "fixtures": [
+    {
+      "slug": "activity-with-no-records",
+      "path": "files/activity-with-no-records/no-records.fit",
+      "title": "Activity file with session totals but zero record messages",
+      "description": "A 339-byte FIT activity file produced by Garmin Connect (the web platform, listed as creator). The file contains a valid activity/session/lap structure declaring a 40-minute, 4 km running activity on 2020-10-24, but contains zero `record` messages — the per-second time-series data is entirely absent. This shape arises in practice when summaries are exported without sample data, or when records are stripped server-side.",
+      "defects": [
+        {
+          "layer": 4,
+          "nature": "missing",
+          "notes": "Activity, session, and lap messages are present and self-consistent (40:00 / 4 km), but there are no `record` messages at all. The full record-level time series is missing, not gappy."
+        }
+      ],
+      "expected_behavior": "Parser must not crash on an activity with zero records. It should expose session/lap totals (duration 40:00, distance 4 km, sport running) and return an empty record stream — not synthesize fake records from the totals."
+    },
+    {
+      "slug": "clean-cycling-6h",
+      "path": "files/clean-cycling-6h/long.fit",
+      "title": "Clean 6-hour road cycling activity (large file)",
+      "description": "Road cycling activity recorded 2024-05-10, 6:01:05 / 125.4 km, on a Garmin Edge 1030 Plus paired with HRM Pro (heart rate), Rally 200 (power), a CORE body-temperature sensor (developer), and another developer device identified only by UUID. 21,666 record rows in a 2.1 MB file, monotonic timestamps, no duplicates. Control fixture and informal performance benchmark — useful for catching parsers that allocate poorly on long activities or mishandle developer devices.",
+      "defects": [],
+      "expected_behavior": "Parser should return 21,666 records spanning 2024-05-10T08:10:46Z to 14:11:51Z, populate the standard activity columns, and report sport=cycling, sub_sport=road. Developer fields/devices should not cause failures — they are well-formed."
+    },
+    {
+      "slug": "clean-running-1h",
+      "path": "files/clean-running-1h/001_running.fit",
+      "title": "Clean ~1 hour road running activity",
+      "description": "Road running activity recorded 2024-03-05, 56:07 / 9.6 km, on a Garmin fenix 6 paired with five sensors: Garmin HRM Pro (heart rate), Stryd (power), Moxy (muscle oxygen), and two generic Garmin sensors. 3,369 record rows, monotonic timestamps, no duplicates. Control fixture: representative of a well-formed multi-sensor activity.",
+      "defects": [],
+      "expected_behavior": "Parser should return 3,369 records spanning 2024-03-05T10:03:07Z to 10:59:15Z, populate heart_rate / cadence / power / speed / altitude / temperature / distance, and report sport=running, sub_sport=road. No defect-related warnings expected."
+    },
+    {
+      "slug": "duplicate-timestamps",
+      "path": "files/duplicate-timestamps/non-unique-timestamps.fit",
+      "title": "Cycling activity with duplicate, non-monotonic timestamps",
+      "description": "Road cycling activity recorded 2020-07-21, 1:59:10 / 46.4 km, on a Garmin Forerunner 35 (a running watch repurposed for cycling) plus a generic Garmin sensor. 7,150 record rows. Of those, 22 timestamps are exact duplicates of an earlier record's timestamp, and the timestamp sequence is not monotonically non-decreasing — i.e. samples appear with timestamps earlier than the preceding sample. The defect is in the time-series ordering, not in any individual sample's value.",
+      "defects": [
+        {
+          "layer": 4,
+          "nature": "implausible",
+          "cause": [
+            "sensor",
+            "firmware"
+          ],
+          "notes": "22 records carry timestamps identical to earlier records, and the overall timestamp sequence is not monotonic. Two physical samples cannot share an instant, and time cannot run backwards."
+        }
+      ],
+      "expected_behavior": "Parser must not crash on duplicate or out-of-order timestamps. Robust parsers should detect the condition and either (a) drop the duplicates / reorder, or (b) surface a warning with the offending indices so downstream code can decide. Aggregate computations (avg/max power, normalized power, distance integration) should be defined on a deduplicated, monotonic projection — not on the raw stream."
+    },
+    {
+      "slug": "running-with-developer-fields",
+      "path": "files/running-with-developer-fields/with-developer-fields.fit",
+      "title": "Running activity with developer fields",
+      "description": "Road running activity recorded 2024-12-10, 47:09 / 7.6 km, on a Garmin fenix 6 with HRM Pro, Stryd, Moxy, and two third-party developer devices (CORE body temperature, Concept2). 2,831 record rows, monotonic timestamps, no duplicates. The file itself is clean — its value is as a control for parsers that need to handle FIT developer-field declarations and the corresponding developer-data records without crashing or silently dropping data.",
+      "defects": [],
+      "expected_behavior": "Parser should return 2,831 records, populate the standard columns, and either expose developer fields (CORE body temperature, Concept2 metrics) or skip them cleanly. A parser that crashes on developer field definitions is broken; a parser that silently discards them without warning is also questionable."
+    }
+  ]
 }

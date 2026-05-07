@@ -1,0 +1,7 @@
+{
+  "$schema": "../../schema/fixture.schema.json",
+  "title": "Clean 6-hour road cycling activity (large file)",
+  "description": "Road cycling activity recorded 2024-05-10, 6:01:05 / 125.4 km, on a Garmin Edge 1030 Plus paired with HRM Pro (heart rate), Rally 200 (power), a CORE body-temperature sensor (developer), and another developer device identified only by UUID. 21,666 record rows in a 2.1 MB file, monotonic timestamps, no duplicates. Control fixture and informal performance benchmark — useful for catching parsers that allocate poorly on long activities or mishandle developer devices.",
+  "defects": [],
+  "expected_behavior": "Parser should return 21,666 records spanning 2024-05-10T08:10:46Z to 14:11:51Z, populate the standard activity columns, and report sport=cycling, sub_sport=road. Developer fields/devices should not cause failures — they are well-formed."
+}
