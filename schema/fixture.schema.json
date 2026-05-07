@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/aart/misfits/schema/fixture.schema.json",
+  "title": "MisFITs fixture metadata",
+  "description": "Metadata for a single FIT-file fixture. Lives at files/{slug}/metadata.json.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["title", "description", "defects"],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Optional pointer back to this schema for editor support."
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1
+    },
+    "defects": {
+      "type": "array",
+      "description": "List of defects present in the file. Empty array means a known-good control fixture.",
+      "items": { "$ref": "#/$defs/defect" }
+    },
+    "expected_behavior": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Optional. What a robust parser should do when it encounters this file. Prose for now; may become structured later."
+    }
+  },
+  "$defs": {
+    "defect": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["layer", "nature"],
+      "properties": {
+        "layer": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 8,
+          "description": "Layer of the FIT stack where the defect lives. See TAXONOMY.md."
+        },
+        "nature": {
+          "type": "string",
+          "enum": ["missing", "malformed", "implausible", "biased", "mislabeled"]
+        },
+        "cause": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "enum": ["sensor", "firmware", "user", "environment", "transmission", "schema"]
+          }
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}
